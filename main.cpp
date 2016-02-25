@@ -1,83 +1,10 @@
 #include <iostream>
 #include <string.h>
-#include <cstring>
+#include "functions.h"
 
 using namespace std ;
-/////////////
-//Structure//
-/////////////
-struct File {
-    char *Date;
-    char *Time;
-    char *Name;
-    int Size;
-};
+
 int sz;
-
-
-
-/*void init(File *f) {
-    f->Name = NULL;
-    f->Date = NULL;
-    f->Time = NULL;
-}*/
-
-void readData(int i,int n, char *Name, char *Date, char *Time){
-
-        cout << "Enter name of file " << i+1 << ": ";
-        cin >> Name;
-        cout << "Enter date of file " << i+1 << ": ";
-        cin >> Date;
-        cout << "Enter time of file " << i+1 << ": ";
-        cin >> Time;
-        cout << "Enter size of file " << i+1 << ": ";
-        cin >> sz;
-        cout << "" << endl;
-
-    return ;
-}
-void writeData(int n,File *f){
-    int i;
-    for (i = 0; i < n; i++) {
-        cout << "Name of file " << i + 1 << " is " << f->Name << endl;
-        cout << "Date of file " << i + 1 << " is " << f->Date << endl;
-        cout << "Time of file " << i + 1 << " is " << f->Time << endl;
-        cout << "Size of file " << i + 1 << " is " << f->Size << endl;
-        cout << endl;
-    }
-}
-void setFile(File *f, char *newN, char *newD, char *newT, int newS){
-
-    if(f->Name)
-        delete[]f->Name;
-    f->Name = new char[strlen(newD)+1];
-    strcpy(f->Name, newN);
-
-    if(f->Date)
-        delete[]f->Date;
-    f->Date = new char[strlen(newT)+1];
-    strcpy(f->Date, newD);
-
-    if(f->Time)
-        delete[]f->Time;
-    f->Time = new char[strlen(newN)+1];
-    strcpy(f->Time, newT);
-
-    f->Size = newS;
-
-}
-
-void Destroy(File *f){
-    delete[] f->Date;
-    f->Date = NULL;
-
-    delete[] f->Time;
-    f->Time = NULL;
-
-    delete[] f->Name;
-    f->Name = NULL;
-}
-
 int main(){
     int option;
     File **f = NULL;
@@ -91,7 +18,7 @@ int main(){
         cout << "3.Edit files" << endl;
         cout << "4.Sort" << endl;
         cout << "5.Delete database" << endl;
-        cout << "5.Exit" << endl;
+        cout << "6.Exit" << endl;
         cout << "------------------" << endl;
         cout << "Enter you option: "<< endl;
         cin >> option;
@@ -101,19 +28,52 @@ int main(){
                 char Name[255], Date[255], Time[255];
                 cout << "Enter number of file :";
                 cin >> n;
+                cout << ""<<endl;
                 f = (File **) realloc(f, n*sizeof(File*));
-                if(f){
-                    cout << sizeof(f)<< endl;
-                }
                 for (i=0;i<n;i++){
-                    //init(f[i]);
-                    readData(i,n,Name,Date,Time);
+                    f[i] = new File;
+                    readData(i,Name,Date,Time,sz);
                     setFile(f[i],Name,Date,Time,sz);
                 }
                 break;
 
             case 2:
-                writeData(n,f[i]);
+                for (i=0;i<n;i++){
+                    writeData(i,f[i]);
+                }
+                break;
+
+            case 3:
+                int num;
+                cout << "Which file you want to edit ? " ;
+                cin >> num;
+                init(f[num-1]);
+                readData(num-1,Name,Date,Time,sz);
+                setFile(f[num-1],Name,Date,Time,sz);
+                break;
+
+            case 4:
+                char ch;
+                int j;
+                File *tmp;
+                cout << "Want to sort files ?(y/n) ";
+                cin >> ch;
+                if (ch == 'y'){
+                    for (j=0;j<n-1;j++){
+                        for(i=0;i<n-j-1;i++){
+                            if(strcmp(f[i]->Name,f[i+1]->Name) > 0){
+                                tmp = f[i];
+                                f[i] = f[i+1];
+                                f[i+1] = tmp;
+                            }
+                        }
+                    }
+                }
+
+            case 5:
+                for(i=0;i<n;i++){
+                    Destroy(f[i]);
+                }
                 break;
 
             default:break;
